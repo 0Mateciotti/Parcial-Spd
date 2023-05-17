@@ -253,3 +253,5 @@ int secuencia(){
   return piso;
 }
 ~~~
+## Link
+-[ThinkerCad](https://www.tinkercad.com/things/0LaWNvsofWZ-parcial-1/editel?sharecode=V8c4sTnYOSaBqiiUxvruvRA-3f1B6Zt3BWbGSOSjx8M)
