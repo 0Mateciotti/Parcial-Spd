@@ -1,11 +1,16 @@
-## Alumno 
+## Alumno.
 - Mateo Ciotti
 
-## Proyecto
+# Proyecto
 <img src="https://github.com/0Mateciotti/Parcial-Spd/blob/main/Parcial/Fotos/arduino.PNG?raw=true" width="800"/>
 <img src="https://github.com/0Mateciotti/Parcial-Spd/blob/main/Parcial/Fotos/esqueletico.PNG?raw=true" width="800"/>
 
-# Defines y declaraciones
+# Funcionamiento del programa
+### El programa cuenta con 3 botones (uno para subir de piso, otro para bajar de piso y otro para frenar el montacargas), un led rojo que indica que el montacargas no se esta moviendo , uno verde que indica que si se esta moviendo y un display de 7 segmentos que muestra en cada momento el piso en el que se encuentra.
+
+
+
+# Defines y declaraciones.
 ~~~ C
 #define SEGMENTOA 10
 #define SEGMENTOB 9
@@ -26,7 +31,7 @@ int bajar;
 int pausa;
 int flag =0;
 ~~~
-# Set up y loop
+# Set up y loop.
 ~~~ C
 void setup()
 {
@@ -44,35 +49,19 @@ void setup()
 
 void loop()
 {
-  /*Empieza el programa con la flag = 0 asi muestra el 0 al inicio*/
-  if (flag == 0){
-  
-  displayNumero(piso);
-  digitalWrite(LEDROJO,HIGH);
-  digitalWrite(LEDVERDE,LOW);
-    
-  Serial.print("Estas en el piso: ");
-  Serial.println(piso);
-    
-  flag = 1;  
-  delay(PAUSA);
-    
-  }else{
-    
-  //Apartir de la segunda iteracion empieza esta parte que ya opera con los botones
+  //Se ejecuta la funcion secuencia y se muestra el piso en el que estamos
   piso = secuencia();
- 
   displayNumero(piso); 
     
   Serial.print("Estas en el piso: ");
   Serial.println(piso);
     
   delay(PAUSA);
-  }
 }
 ~~~
 
-# Funcion displayNumero
+# Funcion displayNumero.
+#### Esta funcion recibe un numero del 0-9 y muestra ese numero en un display de 7 segmentos.
 ~~~ C
 void displayNumero(int piso){
 	/*Recibe un entero(piso) y en los casos del 0-9 mostrara ese
@@ -191,7 +180,8 @@ void displayNumero(int piso){
   }
 }
 ~~~
-# Funcion detectarBoton
+# Funcion detectarBoton.
+#### Retorna 0 si no se detecta una pulsacion de boton en el pin ingresado o 1 si detecta una pulsacion en ese pin.
 ~~~ C 
 int detectarBoton(int pin){
 	int retorno = 0;
@@ -203,53 +193,78 @@ int detectarBoton(int pin){
 	return retorno;
 }
 ~~~
-# Funcion secuencia
+# Funcion ledMovimiento.
+#### Recibe un parametro de tipo entero (0/1) y en cada caso prende el led rojo y apaga el verde o viceversa.
+~~~C void led_movimiento(int tipo){
+
+  if (tipo == 0){
+    
+  	digitalWrite(LEDROJO,LOW);
+    digitalWrite(LEDVERDE,HIGH); 
+  }else{
+  
+  	digitalWrite(LEDROJO,HIGH);
+    digitalWrite(LEDVERDE,LOW);
+  }
+}
+~~~
+
+
+
+# Funcion secuencia.
+#### Esta es la funcion principal del programa y se encarga de detectar que boton es pulsado subir, bajar de piso o mantenerse en el que ya esta.
 ~~~ C 
 int secuencia(){
-  //secuencia pausa
- if (detectarBoton(BOTON_PAUSA) == 1){
-   
-    bajar = 0;
-    subir = 0;
-    pausa = 1;
-  }
-  //Secuencia subir piso
-  if (detectarBoton(BOTON_SUBIR) == 1 || subir == 1){
+  	//En la primera iteracion se muetra el piso 0 y se prende el led que indica no movimiento
+  if (flag == 0){
     
-  	subir = 1;
-    bajar = 0;
-    pausa = 0;
+  	displayNumero(piso);
+    led_movimiento(1);
     
-    if (piso < 9){
-      piso++;
-      digitalWrite(LEDROJO,LOW);
-      digitalWrite(LEDVERDE,HIGH);
-      
-    }else{
-      digitalWrite(LEDROJO,HIGH);
-      digitalWrite(LEDVERDE,LOW);
-    }    
     
-  }
-  //Secuencia bajar piso
-  if(detectarBoton(BOTON_BAJAR) == 1 || bajar == 1){
-  
-  	bajar = 1;
-    subir = 0;
-    pausa = 0;
-    
-     if (piso > 0){
-      piso--;
-      digitalWrite(LEDROJO,LOW);
-      digitalWrite(LEDVERDE,HIGH);
-       
-    }else{
-      digitalWrite(LEDROJO,HIGH);
-      digitalWrite(LEDVERDE,LOW);
-       
+    flag = 1; 
+  }else{
+    //secuencia pausa
+   if (detectarBoton(BOTON_PAUSA) == 1){
+
+      bajar = 0;
+      subir = 0;
+      pausa = 1;
+      led_movimiento(1);
+    }
+    //Secuencia subir piso
+    if (detectarBoton(BOTON_SUBIR) == 1 || subir == 1){
+
+      subir = 1;
+      bajar = 0;
+      pausa = 0;
+
+      if (piso < 9){
+        piso++;
+        led_movimiento(0);
+
+      }else{
+        led_movimiento(1);;
+      }    
+
+    }
+    //Secuencia bajar piso
+    if(detectarBoton(BOTON_BAJAR) == 1 || bajar == 1){
+
+      bajar = 1;
+      subir = 0;
+      pausa = 0;
+
+       if (piso > 0){
+        piso--;
+        led_movimiento(0);
+
+      }else{
+        led_movimiento(1);
+
+      }
     }
   }
-  
   return piso;
 }
 ~~~
