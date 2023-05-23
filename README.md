@@ -40,9 +40,9 @@ void setup()
     pinMode(i, OUTPUT);
   }
   
-  pinMode(BOTON_SUBIR, OUTPUT);
-  pinMode(BOTON_BAJAR, OUTPUT);
-  pinMode(BOTON_PAUSA, OUTPUT);
+  pinMode(BOTON_SUBIR, INPUT);
+  pinMode(BOTON_BAJAR, INPUT);
+  pinMode(BOTON_PAUSA, INPUT);
   
   Serial.begin(9600);
 }
@@ -219,7 +219,7 @@ int secuencia(){
   if (flag == 0){
     
   	displayNumero(piso);
-    led_movimiento(1);
+    ledMovimiento(1);
     
     
     flag = 1; 
@@ -229,11 +229,18 @@ int secuencia(){
 
       bajar = 0;
       subir = 0;
-      pausa = 1;
-      led_movimiento(1);
+      pausa++;
+    	
+     if (pausa == 2){
+     	pausa = 0; 
+     
+     }
+      
+     
+      ledMovimiento(1);
     }
     //Secuencia subir piso
-    if (detectarBoton(BOTON_SUBIR) == 1 || subir == 1){
+    if (detectarBoton(BOTON_SUBIR) == 1 && pausa == 0){
 
       subir = 1;
       bajar = 0;
@@ -241,15 +248,15 @@ int secuencia(){
 
       if (piso < 9){
         piso++;
-        led_movimiento(0);
+        ledMovimiento(0);
 
       }else{
-        led_movimiento(1);;
+        ledMovimiento(1);;
       }    
 
     }
     //Secuencia bajar piso
-    if(detectarBoton(BOTON_BAJAR) == 1 || bajar == 1){
+    if(detectarBoton(BOTON_BAJAR) == 1 && pausa == 0){
 
       bajar = 1;
       subir = 0;
@@ -257,11 +264,10 @@ int secuencia(){
 
        if (piso > 0){
         piso--;
-        led_movimiento(0);
+        ledMovimiento(0);
 
       }else{
-        led_movimiento(1);
-
+        ledMovimiento(1);
       }
     }
   }
